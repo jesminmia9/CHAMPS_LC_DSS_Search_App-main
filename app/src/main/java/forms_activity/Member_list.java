@@ -124,10 +124,11 @@ public class Member_list extends AppCompatActivity {
     RelativeLayout secBari;
     static String HHID ;
 
+    private static final String DEFAULT_SELECTION = "Select from list";
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try
-        {
+
             setContentView(R.layout.member_list);
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
             C = new Connection(this);
@@ -154,14 +155,7 @@ public class Member_list extends AppCompatActivity {
                     adb.show();
                 }});
 
-            txtSearch = (EditText)findViewById(R.id.txtSearch);
-            btnSearch = (ImageButton) findViewById(R.id.btnSearch);
 
-            btnSearch.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View view) {
-                    DataSearch();
-
-                }});
 
 
 
@@ -187,273 +181,171 @@ public class Member_list extends AppCompatActivity {
             FaName =IDbundle.getString("FaName");
             MoName =IDbundle.getString("MoName");
 
-            spnLocation = (Spinner)findViewById(R.id.spnLocation);
-            spnVillage = (Spinner)findViewById(R.id.spnVillage);
-            spnCompound = (Spinner)findViewById(R.id.spnCompound);
-            spnHousehold = (Spinner)findViewById(R.id.spnHousehold);
+            // Initialize UI components
+            initUI();
+
+            // Setup RecyclerView
+            setupRecyclerView();
+
+            // Populate initial spinner data
+            populateInitialSpinners();
+
+            // Set listeners for spinners
+            setupSpinnerListeners();
+
+            // Set search button functionality
+            btnSearch.setOnClickListener(v -> performSearch());
 
 
-            spnLocation.setAdapter(C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo"));
-            spnVillage.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
-                    "WHERE GeoLevel7 = '" + spnLocation.getSelectedItem().toString().split("-")[0] + "'"));
-            spnCompound.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
-                    "WHERE VillID = '" + spnVillage.getSelectedItem().toString().split("-")[0] + "'"));
-            spnHousehold.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT HHID || '-' || HHHead FROM Member_Allinfo " +
-                    "WHERE CompoundID = '" + spnCompound.getSelectedItem().toString().split("-")[0] + "'"
-            ));
-
-
-
-
-
-            spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
-                    spnVillage.setAdapter(C.getArrayAdapter(
-                            "SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
-                                    "WHERE GeoLevel7 = '" + selectedLocation + "'"
-                    ));
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
-            });
-
-
-            spnVillage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    String selectedVillage = spnVillage.getSelectedItem().toString().split("-")[0];
-
-
-                    spnCompound.setAdapter(C.getArrayAdapter(
-                            "SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
-                                    "WHERE VillID = '" + selectedVillage + "'"
-                    ));
-
-                    String query1 = "SELECT * FROM Member_Allinfo WHERE VillID='" + selectedVillage + "'";
-                    List<Member_DataModel> members = C.fetchMembers(query1); // Implement this method in Connection class
-                    dataList.clear();
-                    dataList.addAll(members);
-                    mAdapter.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
-            });
-
-
-
-            spnCompound.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (spnCompound.getSelectedItem() != null && position != 0) {
-                        txtSearch.setText(""); // Clear search box when the spinner changes
-
-                        String selectedCompound = spnCompound.getSelectedItem().toString().split("-")[0];
-
-                        // Fetch and set adapter for spnHousehold
-                        ArrayAdapter<String> householdAdapter = C.getArrayAdapter(
-                                "SELECT '' UNION SELECT DISTINCT HHID || '-' || HHHead FROM Member_Allinfo " +
-                                        "WHERE CompoundID = '" + selectedCompound + "'"
-                        );
-                        spnHousehold.setAdapter(householdAdapter);
-
-                        // Update the dataList dynamically based on selectedCompound
-                        String query = "SELECT * FROM Member_Allinfo WHERE CompoundID = '" + selectedCompound + "'";
-                        List<Member_DataModel> updatedMembers = C.fetchMembers(query); // Implement this method in the Connection class
-                        dataList.clear(); // Clear the existing list
-                        dataList.addAll(updatedMembers); // Add the new data
-                        mAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the list view or RecyclerView
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
-            });
-
-
-            spnHousehold.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (spnHousehold.getSelectedItem() != null && position != 0) {
-                        String selectedHousehold = spnHousehold.getSelectedItem().toString().split("-")[0];
-
-
-
-                        // Update the dataList dynamically based on selectedHousehold
-                        String query2 = "SELECT * FROM Member_Allinfo WHERE HHID='" + selectedHousehold + "'";
-                        List<Member_DataModel> updatedMember = C.fetchMembers(query2);
-
-                        dataList.clear();
-                        dataList.addAll(updatedMember);
-                        mAdapter.notifyDataSetChanged();
-                    }
-
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-            //=========================================================================================
-            // Spinner for Status (Pregnant/Death);
-            //=========================================================================================
-
-            Spinner spnStatus = findViewById(R.id.spnStatus);
-            // Define spinner options from strings.xml
-            ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(
-                    this,
-                    R.array.spinner_status_options,
-                    android.R.layout.simple_spinner_item
-            );
-            statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-            // Set the adapter
-            spnStatus.setAdapter(statusAdapter);
-            spnStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                    String selectedStatus = spnStatus.getSelectedItem().toString();
-                    if (!TextUtils.isEmpty(selectedStatus)) {
-                        filterByStatus(selectedStatus);
-                    }
-                }
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                    // Do nothing
-                }
-            });
-
-
-
-
-
-            // txtSearch = (EditText)findViewById(R.id.txtSearch);
-
-            recyclerView = (RecyclerView)findViewById(R.id.recyclerViewMembers);
-            mAdapter = new DataAdapter(dataList);
-            recyclerView.setItemViewCacheSize(20);
-            recyclerView.setDrawingCacheEnabled(true);
-            recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-            recyclerView.setHasFixedSize(true);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-            recyclerView.setLayoutManager(mLayoutManager);
-            recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
-            recyclerView.setAdapter(mAdapter);
-
-
-
-
-        }
-        catch(Exception  e)
-        {
-            Connection.MessageBox(Member_list.this, e.getMessage());
-            return;
-        }
     }
 
-    private void filterByStatus(String status) {
-        String query = "SELECT MemID, DSSID, VillID, Pstat, DthDate, Name, HHHead, Age, Sex, LmpDt, BDate, MoName, FaName, Active " +
-                "FROM Member_Allinfo WHERE Active = '1'";
+    private void initUI() {
+        spnStatus = findViewById(R.id.spnStatus);
+        spnLocation = findViewById(R.id.spnLocation);
+        spnVillage = findViewById(R.id.spnVillage);
+        spnCompound = findViewById(R.id.spnCompound);
+        spnHousehold = findViewById(R.id.spnHousehold);
+        txtSearch = findViewById(R.id.txtSearch);
+        btnSearch = findViewById(R.id.btnSearch);
+    }
 
-        if ("Pregnant".equals(status)) {
-            query += " AND Pstat = '41'";
-        } else if ("Death".equals(status)) {
-            query += " AND DthDate BETWEEN '2000-01-01' AND '2024-12-31'";
-        }
+    private void setupRecyclerView() {
+        recyclerView = findViewById(R.id.recyclerViewMembers);
+        mAdapter = new DataAdapter(dataList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+    }
 
+    private void populateInitialSpinners() {
+        setupSpinner(spnStatus, new String[]{DEFAULT_SELECTION, "Pregnant", "Dead"});
+        setupSpinner(spnLocation, prependDefault(C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo")));
+        setupSpinner(spnVillage, new String[]{DEFAULT_SELECTION});
+        setupSpinner(spnCompound, new String[]{DEFAULT_SELECTION});
+        setupSpinner(spnHousehold, new String[]{DEFAULT_SELECTION});
+    }
 
+    private void setupSpinnerListeners() {
+        spnLocation.setOnItemSelectedListener(new SpinnerListener(() -> updateVillageSpinner()));
+        spnVillage.setOnItemSelectedListener(new SpinnerListener(() -> updateCompoundSpinner()));
+        spnCompound.setOnItemSelectedListener(new SpinnerListener(() -> updateHouseholdSpinner()));
+        spnHousehold.setOnItemSelectedListener(new SpinnerListener(this::performSearch));
+    }
 
-        try {
-            Connection connection = new Connection(this);
-            List<Member_DataModel> filteredMembers = connection.fetchMembers(query);
+    private void performSearch() {
+        String query = buildFilterQuery();
+        List<Member_DataModel> filteredData = C.fetchMembers(query);
+        updateRecyclerView(filteredData);
+    }
 
-            if (filteredMembers.isEmpty()) {
-                Toast.makeText(this, "No results found for the selected status.", Toast.LENGTH_SHORT).show();
-            } else {
-                dataList.clear();
-                dataList.addAll(filteredMembers);  // Update the global list
-                mAdapter.notifyDataSetChanged();   // Notify the adapter
+    private String buildFilterQuery() {
+        StringBuilder queryBuilder = new StringBuilder("SELECT * FROM Member_Allinfo WHERE Active = '1'");
+
+        if (isSpinnerSelected(spnStatus)) {
+            String status = spnStatus.getSelectedItem().toString();
+            if ("Pregnant".equals(status)) {
+                queryBuilder.append(" AND Pstat = '41'");
+            } else if ("Dead".equals(status)) {
+                queryBuilder.append(" AND DthDate IS NOT NULL");
             }
-        } catch (Exception e) {
-            Toast.makeText(this, "Error fetching data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
-    }
 
+        if (isSpinnerSelected(spnLocation)) {
+            queryBuilder.append(" AND GeoLevel7 = '").append(getSpinnerValue(spnLocation)).append("'");
+        }
+        if (isSpinnerSelected(spnVillage)) {
+            queryBuilder.append(" AND VillID = '").append(getSpinnerValue(spnVillage)).append("'");
+        }
+        if (isSpinnerSelected(spnCompound)) {
+            queryBuilder.append(" AND CompoundID = '").append(getSpinnerValue(spnCompound)).append("'");
+        }
+        if (isSpinnerSelected(spnHousehold)) {
+            queryBuilder.append(" AND HHID = '").append(getSpinnerValue(spnHousehold)).append("'");
+        }
 
-
-
-    private void DataSearch() {
         String searchText = txtSearch.getText().toString().trim();
-
-
-        // Validate spinner selection
-        if (spnVillage.getSelectedItem() == null || spnVillage.getSelectedItem().toString().isEmpty()) {
-            Toast.makeText(this, "Please select a valid village.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Extract Village ID safely
-        String selectedVillage = spnVillage.getSelectedItem().toString();
-        String selectedVillageId = "";
-        if (selectedVillage.contains("-")) {
-            selectedVillageId = selectedVillage.split("-")[0].trim();
-        } else {
-            Toast.makeText(this, "Invalid village format.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Construct SQL query
-        String query = "SELECT MemID, DSSID, VillID, Pstat,DthDate, Name, HHHead, Age, Sex, LmpDt, BDate, MoName, FaName, Active " +
-                "FROM Member_Allinfo " +
-                "WHERE VillID = '" + selectedVillageId + "' " +
-                "AND Active = '1'";
-
-        // Add HHHead condition only if searchText is not empty
         if (!TextUtils.isEmpty(searchText)) {
-            query += " AND HHHead LIKE '%" + searchText + "%'";
+            queryBuilder.append(" AND HHHead LIKE '%").append(searchText).append("%'");
         }
 
-        // Filter the existing dataList
-        List<Member_DataModel> filteredList = new ArrayList<>();
-        for (Member_DataModel member : dataList) {
-            if (member.getHHHead() != null && member.getHHHead().toLowerCase().contains(searchText)) {
-                filteredList.add(member);
-            }
-        }
-
-        // Update RecyclerView
-        if (filteredList.isEmpty()) {
-            Toast.makeText(this, "No results found for the search term.", Toast.LENGTH_SHORT).show();
-        } else {
-            mAdapter = new DataAdapter(filteredList);
-            recyclerView.setAdapter(mAdapter);
-        }
+        return queryBuilder.toString();
     }
 
+    private void updateVillageSpinner() {
+        if (!isSpinnerSelected(spnLocation)) {
+            resetSpinner(spnVillage);
+            resetSpinner(spnCompound);
+            resetSpinner(spnHousehold);
+            return;
+        }
+
+        String location = getSpinnerValue(spnLocation);
+        setupSpinner(spnVillage, prependDefault(C.getArrayAdapter("SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo WHERE GeoLevel7 = '" + location + "'")));
+    }
+
+    private void updateCompoundSpinner() {
+        if (!isSpinnerSelected(spnVillage)) {
+            resetSpinner(spnCompound);
+            resetSpinner(spnHousehold);
+            return;
+        }
+
+        String village = getSpinnerValue(spnVillage);
+        setupSpinner(spnCompound, prependDefault(C.getArrayAdapter("SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo WHERE VillID = '" + village + "'")));
+    }
+
+    private void updateHouseholdSpinner() {
+        if (!isSpinnerSelected(spnCompound)) {
+            resetSpinner(spnHousehold);
+            return;
+        }
+
+        String compound = getSpinnerValue(spnCompound);
+        setupSpinner(spnHousehold, prependDefault(C.getArrayAdapter("SELECT DISTINCT HHID || '-' || HHHead FROM Member_Allinfo WHERE CompoundID = '" + compound + "'")));
+    }
+
+    private void updateRecyclerView(List<Member_DataModel> data) {
+        dataList.clear();
+        dataList.addAll(data);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void setupSpinner(Spinner spinner, String[] values) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, values);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+
+    private String[] prependDefault(String[] values) {
+        String[] result = new String[values.length + 1];
+        result[0] = DEFAULT_SELECTION;
+        System.arraycopy(values, 0, result, 1, values.length);
+        return result;
+    }
+
+    private boolean isSpinnerSelected(Spinner spinner) {
+        return spinner.getSelectedItem() != null && !"Select from list".equals(spinner.getSelectedItem().toString());
+    }
+
+    private String getSpinnerValue(Spinner spinner) {
+        return spinner.getSelectedItem().toString().split("-")[0];
+    }
+
+    private void resetSpinner(Spinner spinner) {
+        setupSpinner(spinner, new String[]{DEFAULT_SELECTION});
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-
+        performSearch(); // Refresh data on resume
     }
 
-
-
-
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_CANCELED) {
-            //Write your code if there's no result
-        } else {
-
+        if (resultCode == Activity.RESULT_OK) {
+            performSearch(); // Refresh data when returning to this activity
         }
     }
 
