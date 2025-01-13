@@ -239,15 +239,27 @@ public class Member_list extends AppCompatActivity {
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     if (position == 0) {
                         // Default item selected; take appropriate action (e.g., show a message or clear dependent spinners)
+
                         spnVillage.setAdapter(null);
                         spnCompound.setAdapter(null);
                         spnHousehold.setAdapter(null);
+                        // Clear RecyclerView data if it changes from LocationItem to default
+                        dataList.clear();
+                        mAdapter.notifyDataSetChanged();
                     } else {
+
                         String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
                         spnVillage.setAdapter(C.getArrayAdapter(
                                 "SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
                                         "WHERE GeoLevel7 = '" + selectedLocation + "'"
+
                         ));
+
+                        DataSearch();
+
+
+
+
                     }
                 }
 
@@ -269,11 +281,12 @@ public class Member_list extends AppCompatActivity {
                                     "WHERE VillID = '" + selectedVillage + "'"
                     ));
 
-                    String query1 = "SELECT * FROM Member_Allinfo WHERE VillID='" + selectedVillage + "'";
-                    List<Member_DataModel> members = C.fetchMembers(query1); // Implement this method in Connection class
-                    dataList.clear();
-                    dataList.addAll(members);
-                    mAdapter.notifyDataSetChanged();
+                //   String query1 = "SELECT * FROM Member_Allinfo WHERE VillID='" + selectedVillage + "'";
+                //   List<Member_DataModel> members = C.fetchMembers(query1); // Implement this method in Connection class
+                //    dataList.clear();
+                //    dataList.addAll(members);
+                //    mAdapter.notifyDataSetChanged();
+                    DataSearch();
                 }
 
                 @Override
@@ -298,11 +311,11 @@ public class Member_list extends AppCompatActivity {
                         spnHousehold.setAdapter(householdAdapter);
 
                         // Update the dataList dynamically based on selectedCompound
-                        String query = "SELECT * FROM Member_Allinfo WHERE CompoundID = '" + selectedCompound + "'";
+/*                        String query = "SELECT * FROM Member_Allinfo WHERE CompoundID = '" + selectedCompound + "'";
                         List<Member_DataModel> updatedMembers = C.fetchMembers(query); // Implement this method in the Connection class
                         dataList.clear(); // Clear the existing list
                         dataList.addAll(updatedMembers); // Add the new data
-                        mAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the list view or RecyclerView
+                        mAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the list view or RecyclerView*/
                     }
                 }
 
@@ -319,12 +332,12 @@ public class Member_list extends AppCompatActivity {
 
 
                         // Update the dataList dynamically based on selectedHousehold
-                        String query2 = "SELECT * FROM Member_Allinfo WHERE HHID='" + selectedHousehold + "'";
+                 /*       String query2 = "SELECT * FROM Member_Allinfo WHERE HHID='" + selectedHousehold + "'";
                         List<Member_DataModel> updatedMember = C.fetchMembers(query2);
 
                         dataList.clear();
                         dataList.addAll(updatedMember);
-                        mAdapter.notifyDataSetChanged();
+                        mAdapter.notifyDataSetChanged();*/
                     }
 
                 }
@@ -435,22 +448,32 @@ public class Member_list extends AppCompatActivity {
         }*/
 
         // Extract Village ID safely
+        String selectedLocation = spnLocation.getSelectedItem().toString();
         String selectedVillage = spnVillage.getSelectedItem().toString();
 
 
+        String selectedLocId = "";
+        if (selectedLocation.contains("-")) {
+            selectedLocId = selectedLocation.split("-")[1].trim();
+        } else {
 
-        String selectedVillageId = "";
+            return;
+        }
+
+
+      String selectedVillageId = "";
         if (selectedVillage.contains("-")) {
             selectedVillageId = selectedVillage.split("-")[0].trim();
         } else {
-            Toast.makeText(this, "Invalid village format.", Toast.LENGTH_SHORT).show();
+
             return;
         }
 
         // Construct SQL query
         String SQL = "SELECT MemID, DSSID, VillID, Pstat,DthDate, Name, HHHead, Age, Sex, LmpDt, BDate, MoName, FaName, Active " +
                 "FROM Member_Allinfo " +
-                "WHERE VillID = '" + selectedVillageId + "' " +
+                "WHERE GeoLevel7 = '" + selectedLocId + "' " +
+                "AND VillID = '" + selectedVillageId + "' " +
                 "AND Active = '1'";
 
         // Add HHHead condition only if searchText is not empty
