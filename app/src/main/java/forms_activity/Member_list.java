@@ -216,17 +216,26 @@ public class Member_list extends AppCompatActivity {
 
 
             // Populate Location Spinner with "Select from list" as default
-            String [] locations = C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo");
-            List<String> locationList = new ArrayList<>();
-            locationList.add("Select from list"); // Add the default option
-            locationList.addAll(Arrays.asList(locations)); // Add fetched locations
-            ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, locationList);
-            locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spnLocation.setAdapter(locationAdapter);
+            List<String> locationsList = new ArrayList<>();
+            ArrayAdapter<String> locationAdapter = C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo");
+
+// Populate the list from the adapter
+            for (int i = 0; i < locationAdapter.getCount(); i++) {
+                locationsList.add(locationAdapter.getItem(i));
+            }
+
+// Add "Select from list" at the start of the list
+            locationsList.add(0, "Select from list");
+
+// Use the list in your spinner adapter
+            ArrayAdapter<String> finalLocationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, locationsList);
+            finalLocationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spnLocation.setAdapter(finalLocationAdapter);
 
 
 
-          //  spnLocation.setAdapter(C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo"));
+
+            //  spnLocation.setAdapter(C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo"));
             spnVillage.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
                     "WHERE GeoLevel7 = '" + spnLocation.getSelectedItem().toString().split("-")[0] + "'"));
             spnCompound.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
@@ -243,28 +252,19 @@ public class Member_list extends AppCompatActivity {
             spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (position == 0) {
-                        // "Select from list" selected - clear dependent spinners
-                        spnVillage.setAdapter(null);
-                        spnCompound.setAdapter(null);
-                        spnHousehold.setAdapter(null);
-                    } else {
-                        // Populate Village Spinner based on selected Location
-                        String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
-                        List<String> villageList = new ArrayList<>();
-                        villageList.add("Select from list");
-                        villageList.addAll(Arrays.asList(C.getArrayAdapter(
-                                "SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo WHERE GeoLevel7 = '" + selectedLocation + "'"
-                        )));
-                        ArrayAdapter<String> villageAdapter = new ArrayAdapter<>(Member_list.this, android.R.layout.simple_spinner_item, villageList);
-                        villageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        spnVillage.setAdapter(villageAdapter);
-                    }
+                    String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
+                    spnVillage.setAdapter(C.getArrayAdapter(
+                            "SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
+                                    "WHERE GeoLevel7 = '" + selectedLocation + "'"
+                    ));
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {}
             });
+
+
+
 
 
             spnVillage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
