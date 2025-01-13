@@ -42,6 +42,7 @@ import org.icddrb.champs_lc_dss_search_member.R;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import Common.Connection;
@@ -157,8 +158,8 @@ public class Member_list extends AppCompatActivity {
                     adb.show();
                 }});
 
-            txtSearch = (EditText)findViewById(R.id.txtSearch);
-            btnSearch = (ImageButton) findViewById(R.id.btnSearch);
+
+
 
             btnSearch.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
@@ -190,13 +191,42 @@ public class Member_list extends AppCompatActivity {
             FaName =IDbundle.getString("FaName");
             MoName =IDbundle.getString("MoName");
 
+
+             // Initialize UI Components
             spnLocation = (Spinner)findViewById(R.id.spnLocation);
             spnVillage = (Spinner)findViewById(R.id.spnVillage);
             spnCompound = (Spinner)findViewById(R.id.spnCompound);
             spnHousehold = (Spinner)findViewById(R.id.spnHousehold);
+            txtSearch = (EditText)findViewById(R.id.txtSearch);
+            btnSearch = (ImageButton) findViewById(R.id.btnSearch);
+             spnStatus = (Spinner) findViewById(R.id.spnStatus);
+
+            // Initialize RecyclerView
+            recyclerView = (RecyclerView)findViewById(R.id.recyclerViewMembers);
+            mAdapter = new DataAdapter(dataList);
+            recyclerView.setItemViewCacheSize(20);
+            recyclerView.setDrawingCacheEnabled(true);
+            recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+            recyclerView.setHasFixedSize(true);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(mAdapter);
 
 
-            spnLocation.setAdapter(C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo"));
+            // Populate Location Spinner with "Select from list" as default
+            String [] locations = C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo");
+            List<String> locationList = new ArrayList<>();
+            locationList.add("Select from list"); // Add the default option
+            locationList.addAll(Arrays.asList(locations)); // Add fetched locations
+            ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, locationList);
+            locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spnLocation.setAdapter(locationAdapter);
+
+
+
+          //  spnLocation.setAdapter(C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo"));
             spnVillage.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
                     "WHERE GeoLevel7 = '" + spnLocation.getSelectedItem().toString().split("-")[0] + "'"));
             spnCompound.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
@@ -209,14 +239,27 @@ public class Member_list extends AppCompatActivity {
 
 
 
+            // Set Location Spinner Listener
             spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
-                    spnVillage.setAdapter(C.getArrayAdapter(
-                            "SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
-                                    "WHERE GeoLevel7 = '" + selectedLocation + "'"
-                    ));
+                    if (position == 0) {
+                        // "Select from list" selected - clear dependent spinners
+                        spnVillage.setAdapter(null);
+                        spnCompound.setAdapter(null);
+                        spnHousehold.setAdapter(null);
+                    } else {
+                        // Populate Village Spinner based on selected Location
+                        String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
+                        List<String> villageList = new ArrayList<>();
+                        villageList.add("Select from list");
+                        villageList.addAll(Arrays.asList(C.getArrayAdapter(
+                                "SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo WHERE GeoLevel7 = '" + selectedLocation + "'"
+                        )));
+                        ArrayAdapter<String> villageAdapter = new ArrayAdapter<>(Member_list.this, android.R.layout.simple_spinner_item, villageList);
+                        villageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spnVillage.setAdapter(villageAdapter);
+                    }
                 }
 
                 @Override
@@ -306,7 +349,7 @@ public class Member_list extends AppCompatActivity {
             // Spinner for Status (Pregnant/Death);
             //=========================================================================================
 
-            Spinner spnStatus = findViewById(R.id.spnStatus);
+
             // Define spinner options from strings.xml
             ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(
                     this,
@@ -337,17 +380,6 @@ public class Member_list extends AppCompatActivity {
 
             // txtSearch = (EditText)findViewById(R.id.txtSearch);
 
-            recyclerView = (RecyclerView)findViewById(R.id.recyclerViewMembers);
-            mAdapter = new DataAdapter(dataList);
-            recyclerView.setItemViewCacheSize(20);
-            recyclerView.setDrawingCacheEnabled(true);
-            recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-            recyclerView.setHasFixedSize(true);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-            recyclerView.setLayoutManager(mLayoutManager);
-            recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-            recyclerView.setItemAnimator(new DefaultItemAnimator());
-            recyclerView.setAdapter(mAdapter);
 
 
 
