@@ -45,6 +45,7 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.lang.String;
 import java.util.concurrent.ExecutionException;
@@ -1999,6 +2000,36 @@ public class Connection extends SQLiteOpenHelper {
         return AREA_LIST;
     }
 
+    public List<String> fetchColumnValues(String query) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<String> result = new ArrayList<>();
+        Cursor cursor = null;
+
+        try {
+            // Execute the query and retrieve the cursor
+            cursor = db.rawQuery(query, null);
+
+            // Iterate through the result set
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    // Add the first column of the current row to the result list
+                    result.add(cursor.getString(0));
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            // Handle exceptions (e.g., log errors, show messages)
+            e.printStackTrace();
+        } finally {
+            // Close the cursor to release resources
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return result;
+    }
+
     public List<Member_DataModel> fetchMembers(String query) {
         List<Member_DataModel> members = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -2029,7 +2060,6 @@ public class Connection extends SQLiteOpenHelper {
         cursor.close();
         return members;
     }
-
 
 
 

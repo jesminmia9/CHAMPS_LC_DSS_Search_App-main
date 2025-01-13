@@ -196,7 +196,18 @@ public class Member_list extends AppCompatActivity {
             spnHousehold = (Spinner)findViewById(R.id.spnHousehold);
 
 
-            spnLocation.setAdapter(C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo"));
+            List<String> locationList = new ArrayList<>();
+            locationList.add("Select from list"); // Add default item
+            locationList.addAll(C.fetchColumnValues("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo")); // Add items from database
+            ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, locationList);
+            locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spnLocation.setAdapter(locationAdapter);
+
+            /*spnLocation.setAdapter(C.getArrayAdapter(
+                    "SELECT 'Select from list' UNION SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo"
+            ));*/
+
+
             spnVillage.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
                     "WHERE GeoLevel7 = '" + spnLocation.getSelectedItem().toString().split("-")[0] + "'"));
             spnCompound.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
@@ -209,7 +220,7 @@ public class Member_list extends AppCompatActivity {
 
 
 
-            spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            /*spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
@@ -221,7 +232,29 @@ public class Member_list extends AppCompatActivity {
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {}
+            });*/
+
+            spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (position == 0) {
+                        // Default item selected; take appropriate action (e.g., show a message or clear dependent spinners)
+                        spnVillage.setAdapter(null);
+                        spnCompound.setAdapter(null);
+                        spnHousehold.setAdapter(null);
+                    } else {
+                        String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
+                        spnVillage.setAdapter(C.getArrayAdapter(
+                                "SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
+                                        "WHERE GeoLevel7 = '" + selectedLocation + "'"
+                        ));
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {}
             });
+
 
 
             spnVillage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
