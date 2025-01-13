@@ -310,6 +310,7 @@ public class Member_list extends AppCompatActivity {
                         );
                         spnHousehold.setAdapter(householdAdapter);
 
+
                         // Update the dataList dynamically based on selectedCompound
 /*                        String query = "SELECT * FROM Member_Allinfo WHERE CompoundID = '" + selectedCompound + "'";
                         List<Member_DataModel> updatedMembers = C.fetchMembers(query); // Implement this method in the Connection class
@@ -454,9 +455,11 @@ public class Member_list extends AppCompatActivity {
 
         String selectedLocId = "";
         if (selectedLocation.contains("-")) {
-            selectedLocId = selectedLocation.split("-")[1].trim();
+            selectedLocId = selectedLocation.split("-")[0].trim();
         } else {
-
+            Log.d("DataSearch", "Invalid Location Selected: " + selectedLocation);
+            dataList.clear();
+            mAdapter.notifyDataSetChanged();
             return;
         }
 
@@ -465,7 +468,9 @@ public class Member_list extends AppCompatActivity {
         if (selectedVillage.contains("-")) {
             selectedVillageId = selectedVillage.split("-")[0].trim();
         } else {
-
+            Log.d("DataSearch", "Invalid Village Selected: " + selectedVillage);
+            dataList.clear();
+            mAdapter.notifyDataSetChanged(); // Clear RecyclerView if village is invalid
             return;
         }
 
@@ -480,6 +485,9 @@ public class Member_list extends AppCompatActivity {
         if (!TextUtils.isEmpty(searchText)) {
             SQL += " AND HHHead LIKE '%" + searchText + "%'";
         }
+
+        Log.d("DataSearch", "SQL Query: " + SQL);
+
 
         //        else if (spnStatus.getSelectedItemPosition() != 0) {
 //            if (spnStatus.getSelectedItemPosition() == 1) {
@@ -497,13 +505,18 @@ public class Member_list extends AppCompatActivity {
 
 
 
+
+
+
         // Filter the existing dataList
-        List<Member_DataModel> filteredList = C.fetchMembers(SQL);
+       /* List<Member_DataModel> filteredList = C.fetchMembers(SQL);
         for (Member_DataModel member : dataList) {
             if (member.getHHHead() != null && member.getHHHead().toLowerCase().contains(searchText)) {
                 filteredList.add(member);
             }
         }
+
+
 
         // Update RecyclerView
         if (filteredList.isEmpty()) {
@@ -511,7 +524,23 @@ public class Member_list extends AppCompatActivity {
         } else {
             mAdapter = new DataAdapter(filteredList);
             recyclerView.setAdapter(mAdapter);
+            mAdapter.notifyDataSetChanged();
+        }*/
+
+        List<Member_DataModel> filteredList = C.fetchMembers(SQL);
+
+        if (filteredList == null || filteredList.isEmpty()) {
+            Log.d("DataSearch", "No data found for the query.");
+            Toast.makeText(this, "No results found for the search term.", Toast.LENGTH_SHORT).show();
+            dataList.clear();
+            mAdapter.notifyDataSetChanged();
+            return;
         }
+
+        dataList.clear();
+        dataList.addAll(filteredList);
+        mAdapter.notifyDataSetChanged();
+        Log.d("DataSearch", "Data updated in RecyclerView.");
     }
 
 
