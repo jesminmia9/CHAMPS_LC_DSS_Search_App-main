@@ -203,9 +203,8 @@ public class Member_list extends AppCompatActivity {
             locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spnLocation.setAdapter(locationAdapter);
 
-            /*spnLocation.setAdapter(C.getArrayAdapter(
-                    "SELECT 'Select from list' UNION SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo"
-            ));*/
+            // Log fetched data for verification
+            Log.d("LocationSpinner", "Fetched locations: " + locationList.toString());
 
 
             spnVillage.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
@@ -237,7 +236,8 @@ public class Member_list extends AppCompatActivity {
             spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (position == 0) {
+                    String selectedLocation = spnLocation.getSelectedItem().toString();
+                    if (position == 0 || selectedLocation.equals("Select from list")) {
                         // Default item selected; take appropriate action (e.g., show a message or clear dependent spinners)
 
                         spnVillage.setAdapter(null);
@@ -246,19 +246,18 @@ public class Member_list extends AppCompatActivity {
                         // Clear RecyclerView data if it changes from LocationItem to default
                         dataList.clear();
                         mAdapter.notifyDataSetChanged();
+                        return;
                     } else {
 
-                        String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
+                        String selectedLocId =  selectedLocation.split("-")[0].trim();
+                        Log.d("LocationSpinner", "Selected GeoLevel7 ID: " + selectedLocId);
+
                         spnVillage.setAdapter(C.getArrayAdapter(
-                                "SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
-                                        "WHERE GeoLevel7 = '" + selectedLocation + "'"
+                                "SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo WHERE GeoLevel7 = '" + selectedLocId + "'"
 
                         ));
 
                         DataSearch();
-
-
-
 
                     }
                 }
@@ -441,47 +440,35 @@ public class Member_list extends AppCompatActivity {
     private void DataSearch() {
         String searchText = txtSearch.getText().toString().trim();
         String selectedLocation = spnLocation.getSelectedItem().toString();
+        String selectedVillage = spnVillage.getSelectedItem() != null ? spnVillage.getSelectedItem().toString() : "";
 
 
 
         // Check if the default "Select from list" is selected
-        if (selectedLocation.equals("Select from list")) {
-            Log.d("DataSearch", "Default Location Selected: No data will be loaded.");
+        if (selectedLocation.equals("Select from list")|| selectedLocation.isEmpty()) {
+            Log.d("DataSearch", "Default location selected, skipping search.");
             dataList.clear();
             mAdapter.notifyDataSetChanged(); // Clear RecyclerView
             return;
         }
 
         // Extract the selected location ID
-        String selectedLocId = "";
-        if (selectedLocation.contains("-")) {
-            selectedLocId = selectedLocation.split("-")[0].trim();
-        } else {
-            Log.d("DataSearch", "Invalid Location Selected: " + selectedLocation);
-            dataList.clear();
-            mAdapter.notifyDataSetChanged();
-            return;
-        }
+        String selectedLocId = selectedLocation.split("-")[0].trim();
+        String selectedVillageId = selectedVillage.contains("-") ? selectedVillage.split("-")[0].trim() : "";
 
-        String selectedVillage = spnVillage.getSelectedItem().toString();
-        String selectedVillageId = "";
-        if (selectedVillage.contains("-")) {
-            selectedVillageId = selectedVillage.split("-")[0].trim();
-        } else {
-            Log.d("DataSearch", "Invalid Village Selected: " + selectedVillage);
-            dataList.clear();
-            mAdapter.notifyDataSetChanged(); // Clear RecyclerView if village is invalid
-            return;
-        }
+
+
 
         // Construct SQL query
         String SQL = "SELECT MemID, DSSID, VillID, Pstat,DthDate, Name, HHHead, Age, Sex, LmpDt, BDate, MoName, FaName, Active " +
                 "FROM Member_Allinfo " +
                 "WHERE GeoLevel7 = '" + selectedLocId + "' " +
-                "AND VillID = '" + selectedVillageId + "' " +
+              //  "AND VillID = '" + selectedVillageId + "' " +
                 "AND Active = '1'";
 
-        // Add HHHead condition only if searchText is not empty
+        if (!selectedVillageId.isEmpty()) {
+            SQL += " AND VillID = '" + selectedVillageId + "'";
+        }
         if (!TextUtils.isEmpty(searchText)) {
             SQL += " AND HHHead LIKE '%" + searchText + "%'";
         }

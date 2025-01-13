@@ -2033,6 +2033,7 @@ public class Connection extends SQLiteOpenHelper {
     public List<Member_DataModel> fetchMembers(String query) {
         List<Member_DataModel> members = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
+
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
             do {
