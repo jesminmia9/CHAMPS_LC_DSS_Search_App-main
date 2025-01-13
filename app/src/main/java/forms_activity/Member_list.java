@@ -252,11 +252,18 @@ public class Member_list extends AppCompatActivity {
             spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
-                    spnVillage.setAdapter(C.getArrayAdapter(
-                            "SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
-                                    "WHERE GeoLevel7 = '" + selectedLocation + "'"
-                    ));
+                   // String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
+
+                    if (spnLocation.getSelectedItem() != null && !spnLocation.getSelectedItem().toString().equals("Select from list")) {
+                        String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
+                        // Proceed with logic
+                        spnVillage.setAdapter(C.getArrayAdapter(
+                                "SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
+                                        "WHERE GeoLevel7 = '" + selectedLocation + "'"
+                        ));
+                    }
+
+
                 }
 
                 @Override
