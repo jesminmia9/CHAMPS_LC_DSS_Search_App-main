@@ -456,7 +456,8 @@ public class Member_list extends AppCompatActivity {
         if (selectedLocation.contains("-")) {
             selectedLocId = selectedLocation.split("-")[1].trim();
         } else {
-
+            dataList.clear();
+            mAdapter.notifyDataSetChanged(); // Clear RecyclerView if location is invalid
             return;
         }
 
@@ -465,7 +466,8 @@ public class Member_list extends AppCompatActivity {
         if (selectedVillage.contains("-")) {
             selectedVillageId = selectedVillage.split("-")[0].trim();
         } else {
-
+            dataList.clear();
+            mAdapter.notifyDataSetChanged(); // Clear RecyclerView if village is invalid
             return;
         }
 
@@ -497,13 +499,18 @@ public class Member_list extends AppCompatActivity {
 
 
 
+
+
+
         // Filter the existing dataList
-        List<Member_DataModel> filteredList = C.fetchMembers(SQL);
+       /* List<Member_DataModel> filteredList = C.fetchMembers(SQL);
         for (Member_DataModel member : dataList) {
             if (member.getHHHead() != null && member.getHHHead().toLowerCase().contains(searchText)) {
                 filteredList.add(member);
             }
         }
+
+
 
         // Update RecyclerView
         if (filteredList.isEmpty()) {
@@ -511,7 +518,18 @@ public class Member_list extends AppCompatActivity {
         } else {
             mAdapter = new DataAdapter(filteredList);
             recyclerView.setAdapter(mAdapter);
+            mAdapter.notifyDataSetChanged();
+        }*/
+
+        List<Member_DataModel> filteredList = C.fetchMembers(SQL);
+
+        if (filteredList.isEmpty()) {
+            Toast.makeText(this, "No results found for the search term.", Toast.LENGTH_SHORT).show();
         }
+
+        dataList.clear();
+        dataList.addAll(filteredList);
+        mAdapter.notifyDataSetChanged();
     }
 
 
