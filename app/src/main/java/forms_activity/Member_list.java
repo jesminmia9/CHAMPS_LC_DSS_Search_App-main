@@ -440,19 +440,19 @@ public class Member_list extends AppCompatActivity {
 
     private void DataSearch() {
         String searchText = txtSearch.getText().toString().trim();
-
-
-       /* // Validate spinner selection
-        if (spnVillage.getSelectedItem() == null || spnVillage.getSelectedItem().toString().isEmpty()) {
-            Toast.makeText(this, "Please select a valid village.", Toast.LENGTH_SHORT).show();
-            return;
-        }*/
-
-        // Extract Village ID safely
         String selectedLocation = spnLocation.getSelectedItem().toString();
-        String selectedVillage = spnVillage.getSelectedItem().toString();
 
 
+
+        // Check if the default "Select from list" is selected
+        if (selectedLocation.equals("Select from list")) {
+            Log.d("DataSearch", "Default Location Selected: No data will be loaded.");
+            dataList.clear();
+            mAdapter.notifyDataSetChanged(); // Clear RecyclerView
+            return;
+        }
+
+        // Extract the selected location ID
         String selectedLocId = "";
         if (selectedLocation.contains("-")) {
             selectedLocId = selectedLocation.split("-")[0].trim();
@@ -463,8 +463,8 @@ public class Member_list extends AppCompatActivity {
             return;
         }
 
-
-      String selectedVillageId = "";
+        String selectedVillage = spnVillage.getSelectedItem().toString();
+        String selectedVillageId = "";
         if (selectedVillage.contains("-")) {
             selectedVillageId = selectedVillage.split("-")[0].trim();
         } else {
@@ -540,7 +540,7 @@ public class Member_list extends AppCompatActivity {
         dataList.clear();
         dataList.addAll(filteredList);
         mAdapter.notifyDataSetChanged();
-        Log.d("DataSearch", "Data updated in RecyclerView.");
+        Log.d("DataSearch", "Data updated in RecyclerView."+ dataList.size() + " items.");
     }
 
 
