@@ -1,5 +1,3 @@
-
-
 package forms_activity;
 
 import android.app.Activity;
@@ -197,17 +195,8 @@ public class Member_list extends AppCompatActivity {
             spnCompound = (Spinner)findViewById(R.id.spnCompound);
             spnHousehold = (Spinner)findViewById(R.id.spnHousehold);
 
-           /* List<String> locationList = C.getSpinnerData("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo");
-            ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, locationList);
-            locationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spnLocation.setAdapter(locationAdapter);*/
 
-
-
-            spnLocation.setAdapter(C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo"));  // Default item
-
-
-
+            spnLocation.setAdapter(C.getArrayAdapter("SELECT DISTINCT GeoLevel7 || '-' || GeoLevel7Name FROM Member_Allinfo"));
             spnVillage.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
                     "WHERE GeoLevel7 = '" + spnLocation.getSelectedItem().toString().split("-")[0] + "'"));
             spnCompound.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
@@ -224,16 +213,10 @@ public class Member_list extends AppCompatActivity {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
-
                     spnVillage.setAdapter(C.getArrayAdapter(
                             "SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
                                     "WHERE GeoLevel7 = '" + selectedLocation + "'"
                     ));
-                    txtSearch.setText(""); // Clear search box when the spinner changes
-                    DataSearch();
-                    // }
-
-
                 }
 
                 @Override
@@ -252,14 +235,12 @@ public class Member_list extends AppCompatActivity {
                             "SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
                                     "WHERE VillID = '" + selectedVillage + "'"
                     ));
-                    txtSearch.setText(""); // Clear search box when the spinner changes
-                    DataSearch();
 
-                  /*  String query1 = "SELECT * FROM Member_Allinfo WHERE VillID='" + selectedVillage + "'";
+                    String query1 = "SELECT * FROM Member_Allinfo WHERE VillID='" + selectedVillage + "'";
                     List<Member_DataModel> members = C.fetchMembers(query1); // Implement this method in Connection class
                     dataList.clear();
                     dataList.addAll(members);
-                    mAdapter.notifyDataSetChanged();*/
+                    mAdapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -271,23 +252,25 @@ public class Member_list extends AppCompatActivity {
             spnCompound.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (spnCompound.getSelectedItem() != null && position != 0) {
+                        txtSearch.setText(""); // Clear search box when the spinner changes
 
-                    //  txtSearch.setText(""); // Clear search box when the spinner changes
+                        String selectedCompound = spnCompound.getSelectedItem().toString().split("-")[0];
 
-                    String selectedCompound = spnCompound.getSelectedItem().toString().split("-")[0];
+                        // Fetch and set adapter for spnHousehold
+                        ArrayAdapter<String> householdAdapter = C.getArrayAdapter(
+                                "SELECT '' UNION SELECT DISTINCT HHID || '-' || HHHead FROM Member_Allinfo " +
+                                        "WHERE CompoundID = '" + selectedCompound + "'"
+                        );
+                        spnHousehold.setAdapter(householdAdapter);
 
-                    // Fetch and set adapter for spnHousehold
-                    ArrayAdapter<String> householdAdapter = C.getArrayAdapter(
-                            "SELECT '' UNION SELECT DISTINCT HHID || '-' || HHHead FROM Member_Allinfo " +
-                                    "WHERE CompoundID = '" + selectedCompound + "'"
-                    );
-                    spnHousehold.setAdapter(householdAdapter);
-                    txtSearch.setText(""); // Clear search box when the spinner changes
-                    DataSearch();
-
-                    // Update the dataList dynamically based on selectedCompound
-
-
+                        // Update the dataList dynamically based on selectedCompound
+                        String query = "SELECT * FROM Member_Allinfo WHERE CompoundID = '" + selectedCompound + "'";
+                        List<Member_DataModel> updatedMembers = C.fetchMembers(query); // Implement this method in the Connection class
+                        dataList.clear(); // Clear the existing list
+                        dataList.addAll(updatedMembers); // Add the new data
+                        mAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the list view or RecyclerView
+                    }
                 }
 
                 @Override
@@ -297,15 +280,19 @@ public class Member_list extends AppCompatActivity {
             spnHousehold.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if (spnHousehold.getSelectedItem() != null && position != 0) {
+                        String selectedHousehold = spnHousehold.getSelectedItem().toString().split("-")[0];
 
-                    String selectedHousehold = spnHousehold.getSelectedItem().toString().split("-")[0];
 
-                    // Update the dataList dynamically based on selectedHousehold
-                    String query2 = "SELECT * FROM Member_Allinfo WHERE HHID='" + selectedHousehold + "'";
 
-                    txtSearch.setText(""); // Clear search box when the spinner changes
-                    DataSearch();
+                        // Update the dataList dynamically based on selectedHousehold
+                        String query2 = "SELECT * FROM Member_Allinfo WHERE HHID='" + selectedHousehold + "'";
+                        List<Member_DataModel> updatedMember = C.fetchMembers(query2);
 
+                        dataList.clear();
+                        dataList.addAll(updatedMember);
+                        mAdapter.notifyDataSetChanged();
+                    }
 
                 }
 
@@ -408,67 +395,54 @@ public class Member_list extends AppCompatActivity {
         String searchText = txtSearch.getText().toString().trim();
 
 
+       /* // Validate spinner selection
+        if (spnVillage.getSelectedItem() == null || spnVillage.getSelectedItem().toString().isEmpty()) {
+            Toast.makeText(this, "Please select a valid village.", Toast.LENGTH_SHORT).show();
+            return;
+        }*/
+
         // Extract Village ID safely
-        //   String selectedVillage = spnVillage.getSelectedItem().toString();
+        String selectedVillage = spnVillage.getSelectedItem().toString();
 
 
 
+        String selectedVillageId = "";
+        if (selectedVillage.contains("-")) {
+            selectedVillageId = selectedVillage.split("-")[0].trim();
+        } else {
+            Toast.makeText(this, "Invalid village format.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-
-        /*// Construct SQL query
+        // Construct SQL query
         String SQL = "SELECT MemID, DSSID, VillID, Pstat,DthDate, Name, HHHead, Age, Sex, LmpDt, BDate, MoName, FaName, Active " +
                 "FROM Member_Allinfo " +
                 "WHERE VillID = '" + selectedVillageId + "' " +
-                "AND Active = '1'";*/
+                "AND Active = '1'";
 
-        // Initialize base SQL query
-        StringBuilder SQL = new StringBuilder(
-                "SELECT MemID, DSSID, VillID, Pstat, DthDate, Name, HHHead, Age, Sex, LmpDt, BDate, MoName, FaName, Active " +
-                        "FROM Member_Allinfo WHERE Active = '1'");
-
-        // Add conditions dynamically based on spinner selections
-        if (spnLocation.getSelectedItem() != null && !spnLocation.getSelectedItem().toString().isEmpty()) {
-            String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
-            SQL.append(" AND GeoLevel7 = '").append(selectedLocation).append("'");
-        }
-        if (spnVillage.getSelectedItem() != null && !spnVillage.getSelectedItem().toString().isEmpty()) {
-            String selectedVillage = spnVillage.getSelectedItem().toString().split("-")[0];
-            SQL.append(" AND VillID = '").append(selectedVillage).append("'");
-        }
-        if (spnCompound.getSelectedItem() != null && !spnCompound.getSelectedItem().toString().isEmpty()) {
-            String selectedCompound = spnCompound.getSelectedItem().toString().split("-")[0];
-            SQL.append(" AND CompoundID = '").append(selectedCompound).append("'");
-        }
-
-        if (spnHousehold.getSelectedItem() != null && !spnHousehold.getSelectedItem().toString().isEmpty()) {
-            String selectedHousehold = spnHousehold.getSelectedItem().toString().split("-")[0];
-            SQL.append(" AND HHID = '").append(selectedHousehold).append("'");
-        }
-
-
-        // Add HHHead condition if search text is not empty
+        // Add HHHead condition only if searchText is not empty
         if (!TextUtils.isEmpty(searchText)) {
-            SQL.append(" AND HHHead LIKE '%").append(searchText).append("%'");
+            SQL += " AND HHHead LIKE '%" + searchText + "%'";
         }
 
-//        else if (spnStatus.getSelectedItemPosition() != 0) {
-//            if (spnStatus.getSelectedItemPosition() == 1) {
-//                SQL += " AND Pstat = '41'";
-//            }
+         if (spnStatus.getSelectedItemPosition() != 0) {
+            if (spnStatus.getSelectedItemPosition() == 1) {
+                SQL += " AND Pstat = '41'";
+           }
 
 
-//            else if (spnStatus.getSelectedItemPosition() == 2) {
-//                SQL += " AND DthDate BETWEEN '2000-01-01' AND '2024-12-31'";
-//            }
+           else if (spnStatus.getSelectedItemPosition() == 2) {
+                SQL += " AND DthDate BETWEEN '2000-01-01' AND '2024-12-31'";
+           }
 
 
-        //           return;
-        //       }
+                 return;
+            }
 
 
 
         // Filter the existing dataList
-        List<Member_DataModel> filteredList = C.fetchMembers(SQL.toString());
+        List<Member_DataModel> filteredList = C.fetchMembers(SQL);
         for (Member_DataModel member : dataList) {
             if (member.getHHHead() != null && member.getHHHead().toLowerCase().contains(searchText)) {
                 filteredList.add(member);
@@ -477,7 +451,7 @@ public class Member_list extends AppCompatActivity {
 
         // Update RecyclerView
         if (filteredList.isEmpty()) {
-            //  Toast.makeText(this, "No results found for the search term.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No results found for the search term.", Toast.LENGTH_SHORT).show();
         } else {
             mAdapter = new DataAdapter(filteredList);
             recyclerView.setAdapter(mAdapter);
