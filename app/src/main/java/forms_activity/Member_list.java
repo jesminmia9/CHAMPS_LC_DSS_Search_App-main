@@ -462,6 +462,7 @@ public class Member_list extends AppCompatActivity {
 
         String selectedCompoundId = selectedCompound.contains("-") ? selectedCompound.split("-")[0].trim() : "";
         String selectedHouseholdId = selectedHousehold.contains("-") ? selectedHousehold.split("-")[0].trim() : "";
+      //  String selectedStatus = spnStatus.getSelectedItem().toString();
 
 
 
@@ -505,44 +506,22 @@ public class Member_list extends AppCompatActivity {
             }
 */
 
-        if (spnStatus.getSelectedItemPosition() != 0) {
-            int selectedPosition = spnStatus.getSelectedItemPosition();
-            Log.d("DataSearch", "spnStatus selected position: " + selectedPosition);
-
-            if (selectedPosition == 1) {
-                SQL += " AND Pstat = '41'";
-            } else if (selectedPosition == 2) {
-                SQL += " AND DthDate BETWEEN '2000-01-01' AND '2024-12-31'";
-            } else {
-                Log.d("DataSearch", "Unhandled spnStatus position: " + selectedPosition);
-            }
-        }
-        Log.d("DataSearch", "SQL Query after status filter: " + SQL);
-
-
-
-
-
-
-
-        // Filter the existing dataList
-       /* List<Member_DataModel> filteredList = C.fetchMembers(SQL);
-        for (Member_DataModel member : dataList) {
-            if (member.getHHHead() != null && member.getHHHead().toLowerCase().contains(searchText)) {
-                filteredList.add(member);
-            }
+        // Get the status filter based on the spinner position
+        int selectedStatusPosition = spnStatus.getSelectedItemPosition();
+        String statusFilter = getStatusFilter(selectedStatusPosition);
+        if (!statusFilter.isEmpty()) {
+            SQL += " AND " + statusFilter;
         }
 
+        Log.d("DataSearch", "Final SQL Query: " + SQL);
 
 
-        // Update RecyclerView
-        if (filteredList.isEmpty()) {
-            Toast.makeText(this, "No results found for the search term.", Toast.LENGTH_SHORT).show();
-        } else {
-            mAdapter = new DataAdapter(filteredList);
-            recyclerView.setAdapter(mAdapter);
-            mAdapter.notifyDataSetChanged();
-        }*/
+
+
+
+
+
+       
 
         List<Member_DataModel> filteredList = C.fetchMembers(SQL);
 
@@ -558,6 +537,17 @@ public class Member_list extends AppCompatActivity {
         dataList.addAll(filteredList);
         mAdapter.notifyDataSetChanged();
         Log.d("DataSearch", "Data updated in RecyclerView."+ dataList.size() + " items.");
+    }
+
+    private String getStatusFilter(int selectedPosition) {
+        switch (selectedPosition) {
+            case 1:
+                return "Pstat = '41'"; // Example for Pregnant status
+            case 2:
+                return "DthDate BETWEEN '2000-01-01' AND '2024-12-31'"; // Example for Death date filter
+            default:
+                return ""; // No filter for default or unhandled positions
+        }
     }
 
 
