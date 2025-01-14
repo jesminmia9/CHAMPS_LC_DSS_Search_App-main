@@ -244,6 +244,7 @@ public class Member_list extends AppCompatActivity {
                         spnCompound.setAdapter(null);
                         spnHousehold.setAdapter(null);
                         // Clear RecyclerView data if it changes from LocationItem to default
+                        txtSearch.setText("");
                         dataList.clear();
                         mAdapter.notifyDataSetChanged();
                         return;
@@ -257,7 +258,7 @@ public class Member_list extends AppCompatActivity {
 
                         ));
 
-                        DataSearch();
+                     //   DataSearch();
 
                     }
                 }
@@ -297,8 +298,8 @@ public class Member_list extends AppCompatActivity {
             spnCompound.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (spnCompound.getSelectedItem() != null && position != 0) {
-                        txtSearch.setText(""); // Clear search box when the spinner changes
+                 //   if (spnCompound.getSelectedItem() != null && position != 0) {
+                     //   txtSearch.setText(""); // Clear search box when the spinner changes
 
                         String selectedCompound = spnCompound.getSelectedItem().toString().split("-")[0];
 
@@ -316,7 +317,8 @@ public class Member_list extends AppCompatActivity {
                         dataList.clear(); // Clear the existing list
                         dataList.addAll(updatedMembers); // Add the new data
                         mAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the list view or RecyclerView*/
-                    }
+                 //   }
+                    DataSearch();
                 }
 
                 @Override
@@ -326,7 +328,7 @@ public class Member_list extends AppCompatActivity {
             spnHousehold.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (spnHousehold.getSelectedItem() != null && position != 0) {
+                 //   if (spnHousehold.getSelectedItem() != null && position != 0) {
                         String selectedHousehold = spnHousehold.getSelectedItem().toString().split("-")[0];
 
 
@@ -338,7 +340,8 @@ public class Member_list extends AppCompatActivity {
                         dataList.clear();
                         dataList.addAll(updatedMember);
                         mAdapter.notifyDataSetChanged();*/
-                    }
+                   // }
+                    DataSearch();
 
                 }
 
@@ -441,8 +444,8 @@ public class Member_list extends AppCompatActivity {
         String searchText = txtSearch.getText().toString().trim();
         String selectedLocation = spnLocation.getSelectedItem().toString();
         String selectedVillage = spnVillage.getSelectedItem() != null ? spnVillage.getSelectedItem().toString() : "";
-
-
+        String selectedCompound = spnCompound.getSelectedItem() != null ? spnCompound.getSelectedItem().toString() : "";
+        String selectedHousehold = spnHousehold.getSelectedItem() != null ? spnHousehold.getSelectedItem().toString() : "";
 
         // Check if the default "Select from list" is selected
         if (selectedLocation.equals("Select from list")|| selectedLocation.isEmpty()) {
@@ -454,7 +457,11 @@ public class Member_list extends AppCompatActivity {
 
         // Extract the selected location ID
         String selectedLocId = selectedLocation.split("-")[0].trim();
+
         String selectedVillageId = selectedVillage.contains("-") ? selectedVillage.split("-")[0].trim() : "";
+
+        String selectedCompoundId = selectedCompound.contains("-") ? selectedCompound.split("-")[0].trim() : "";
+        String selectedHouseholdId = selectedHousehold.contains("-") ? selectedHousehold.split("-")[0].trim() : "";
 
 
 
@@ -462,13 +469,24 @@ public class Member_list extends AppCompatActivity {
         // Construct SQL query
         String SQL = "SELECT MemID, DSSID, VillID, Pstat,DthDate, Name, HHHead, Age, Sex, LmpDt, BDate, MoName, FaName, Active " +
                 "FROM Member_Allinfo " +
-                "WHERE GeoLevel7 = '" + selectedLocId + "' " +
-              //  "AND VillID = '" + selectedVillageId + "' " +
+              //  "WHERE GeoLevel7 = '" + selectedLocId + "' " +
+                "WHERE VillID = '" + selectedVillageId + "' " +
                 "AND Active = '1'";
 
-        if (!selectedVillageId.isEmpty()) {
+       /* if (!selectedVillageId.isEmpty()) {
             SQL += " AND VillID = '" + selectedVillageId + "'";
+        }*/
+
+        if (!selectedCompoundId.isEmpty()) {
+            SQL += " AND CompoundID = '" + selectedCompoundId + "'";
         }
+
+        if (!selectedHouseholdId.isEmpty()) {
+            SQL += " AND Household_ID = '" + selectedHouseholdId + "'";
+        }
+
+
+
         if (!TextUtils.isEmpty(searchText)) {
             SQL += " AND HHHead LIKE '%" + searchText + "%'";
         }
@@ -476,19 +494,16 @@ public class Member_list extends AppCompatActivity {
         Log.d("DataSearch", "SQL Query: " + SQL);
 
 
-        //        else if (spnStatus.getSelectedItemPosition() != 0) {
-//            if (spnStatus.getSelectedItemPosition() == 1) {
-//                SQL += " AND Pstat = '41'";
-//            }
+            /*if (spnStatus.getSelectedItemPosition() != 0) {
 
 
-//            else if (spnStatus.getSelectedItemPosition() == 2) {
-//                SQL += " AND DthDate BETWEEN '2000-01-01' AND '2024-12-31'";
-//            }
+                if (spnStatus.getSelectedItemPosition() == 1) {
+                    SQL += " AND Pstat = '41'";
+                } else if (spnStatus.getSelectedItemPosition() == 2) {
+                    SQL += " AND DthDate BETWEEN '2000-01-01' AND '2024-12-31'";
+                }
+            }*/
 
-
-        //           return;
-        //       }
 
 
 
