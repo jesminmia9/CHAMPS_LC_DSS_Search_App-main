@@ -502,7 +502,22 @@ public class Member_list extends AppCompatActivity {
                 } else if (spnStatus.getSelectedItemPosition() == 2) {
                     SQL += " AND DthDate BETWEEN '2000-01-01' AND '2024-12-31'";
                 }
-            }*/
+            }
+*/
+
+        if (spnStatus.getSelectedItemPosition() != 0) {
+            int selectedPosition = spnStatus.getSelectedItemPosition();
+            Log.d("DataSearch", "spnStatus selected position: " + selectedPosition);
+
+            if (selectedPosition == 1) {
+                SQL += " AND Pstat = '41'";
+            } else if (selectedPosition == 2) {
+                SQL += " AND DthDate BETWEEN '2000-01-01' AND '2024-12-31'";
+            } else {
+                Log.d("DataSearch", "Unhandled spnStatus position: " + selectedPosition);
+            }
+        }
+        Log.d("DataSearch", "SQL Query after status filter: " + SQL);
 
 
 
