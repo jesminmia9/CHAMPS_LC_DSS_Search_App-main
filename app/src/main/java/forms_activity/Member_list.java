@@ -39,6 +39,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import org.icddrb.champs_lc_dss_search_member.R;
+import org.icddrb.champs_lc_dss_search_member.adapter.CustomSpinnerAdapter;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,6 +48,8 @@ import java.util.List;
 import java.util.Locale;
 import Common.Connection;
 import Common.Global;
+import Common.Global_CodeList;
+import Common.ProjectSetting;
 import Utility.MySharedPreferences;
 import forms_datamodel.Member_DataModel;
 import android.text.TextWatcher;
@@ -64,7 +68,6 @@ public class Member_list extends AppCompatActivity {
     private String DthStatus;
     private String DthDate;
     private String Name;
-
     private String GeoLevel7;
     private String GeoLevel7Name;
     private String VillCode;
@@ -168,33 +171,11 @@ public class Member_list extends AppCompatActivity {
 
 
 
-            IDbundle = getIntent().getExtras();
-            MemID    = IDbundle.getString("MemID");
-            GeoLevel7 =IDbundle.getString("GeoLevel7");
-            GeoLevel7Name =IDbundle.getString("GeoLevel7Name");
-            VillCode =IDbundle.getString ("VillCode");
-            VillName =IDbundle.getString("VillName");
-            CompoundCode =IDbundle.getString("CompoundCode");
-            CompoundName =IDbundle.getString("CompoundName");
-            HHNO =IDbundle.getString("HHNO");
-            HHHead =IDbundle.getString("HHHead");
-            MSlNo =IDbundle.getString("MSlNo");
-            Name =IDbundle.getString("Name");
-            HHHead =IDbundle.getString("HHHead");
-            DSSID =IDbundle.getString ("DSSID");
-            preganat =IDbundle.getString ("Pstat");
-            DthDate =IDbundle.getString ("DthDate");
-            BDate =IDbundle.getString ("BDate");
-            Age =IDbundle.getString ("Age");
-            Sex =IDbundle.getString ("Sex");
-            FaName =IDbundle.getString("FaName");
-            MoName =IDbundle.getString("MoName");
-
             spnLocation = (Spinner)findViewById(R.id.spnLocation);
             spnVillage = (Spinner)findViewById(R.id.spnVillage);
             spnCompound = (Spinner)findViewById(R.id.spnCompound);
             spnHousehold = (Spinner)findViewById(R.id.spnHousehold);
-
+            spnStatus = (Spinner)findViewById(R.id.spnStatus);
 
             List<String> locationList = new ArrayList<>();
             locationList.add("Select from list"); // Add default item
@@ -216,22 +197,10 @@ public class Member_list extends AppCompatActivity {
             ));
 
 
+            //=========================================================================================
+            // Spinner for Location;
+            //=========================================================================================
 
-
-
-            /*spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String selectedLocation = spnLocation.getSelectedItem().toString().split("-")[0];
-                    spnVillage.setAdapter(C.getArrayAdapter(
-                            "SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
-                                    "WHERE GeoLevel7 = '" + selectedLocation + "'"
-                    ));
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
-            });*/
 
             spnLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -258,7 +227,7 @@ public class Member_list extends AppCompatActivity {
 
                         ));
 
-                     //   DataSearch();
+                        //   DataSearch();
 
                     }
                 }
@@ -268,6 +237,11 @@ public class Member_list extends AppCompatActivity {
             });
 
 
+            //=========================================================================================
+            // Spinner for Village
+            //=========================================================================================
+
+
 
             spnVillage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -275,17 +249,11 @@ public class Member_list extends AppCompatActivity {
 
                     String selectedVillage = spnVillage.getSelectedItem().toString().split("-")[0];
 
-
                     spnCompound.setAdapter(C.getArrayAdapter(
                             "SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
                                     "WHERE VillID = '" + selectedVillage + "'"
                     ));
 
-                //   String query1 = "SELECT * FROM Member_Allinfo WHERE VillID='" + selectedVillage + "'";
-                //   List<Member_DataModel> members = C.fetchMembers(query1); // Implement this method in Connection class
-                //    dataList.clear();
-                //    dataList.addAll(members);
-                //    mAdapter.notifyDataSetChanged();
                     DataSearch();
                 }
 
@@ -293,31 +261,25 @@ public class Member_list extends AppCompatActivity {
                 public void onNothingSelected(AdapterView<?> parent) {}
             });
 
-
+            //=========================================================================================
+            // Spinner for Compound
+            //=========================================================================================
 
             spnCompound.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                 //   if (spnCompound.getSelectedItem() != null && position != 0) {
-                     //   txtSearch.setText(""); // Clear search box when the spinner changes
 
-                        String selectedCompound = spnCompound.getSelectedItem().toString().split("-")[0];
+                    //   txtSearch.setText(""); // Clear search box when the spinner changes
 
-                        // Fetch and set adapter for spnHousehold
-                        ArrayAdapter<String> householdAdapter = C.getArrayAdapter(
-                                "SELECT '' UNION SELECT DISTINCT HHID || '-' || HHHead FROM Member_Allinfo " +
-                                        "WHERE CompoundID = '" + selectedCompound + "'"
-                        );
-                        spnHousehold.setAdapter(householdAdapter);
+                    String selectedCompound = spnCompound.getSelectedItem().toString().split("-")[0];
 
+                    // Fetch and set adapter for spnHousehold
+                    ArrayAdapter<String> householdAdapter = C.getArrayAdapter(
+                            "SELECT '' UNION SELECT DISTINCT HHID || '-' || HHHead FROM Member_Allinfo " +
+                                    "WHERE CompoundID = '" + selectedCompound + "'"
+                    );
+                    spnHousehold.setAdapter(householdAdapter);
 
-                        // Update the dataList dynamically based on selectedCompound
-/*                        String query = "SELECT * FROM Member_Allinfo WHERE CompoundID = '" + selectedCompound + "'";
-                        List<Member_DataModel> updatedMembers = C.fetchMembers(query); // Implement this method in the Connection class
-                        dataList.clear(); // Clear the existing list
-                        dataList.addAll(updatedMembers); // Add the new data
-                        mAdapter.notifyDataSetChanged(); // Notify the adapter to refresh the list view or RecyclerView*/
-                 //   }
                     DataSearch();
                 }
 
@@ -325,22 +287,19 @@ public class Member_list extends AppCompatActivity {
                 public void onNothingSelected(AdapterView<?> parent) {}
             });
 
+
+            //=========================================================================================
+            // Spinner for Household
+            //=========================================================================================
+
+
             spnHousehold.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                 //   if (spnHousehold.getSelectedItem() != null && position != 0) {
-                        String selectedHousehold = spnHousehold.getSelectedItem().toString().split("-")[0];
+                    //   if (spnHousehold.getSelectedItem() != null && position != 0) {
+                    String selectedHousehold = spnHousehold.getSelectedItem().toString().split("-")[0];
 
 
-
-                        // Update the dataList dynamically based on selectedHousehold
-                 /*       String query2 = "SELECT * FROM Member_Allinfo WHERE HHID='" + selectedHousehold + "'";
-                        List<Member_DataModel> updatedMember = C.fetchMembers(query2);
-
-                        dataList.clear();
-                        dataList.addAll(updatedMember);
-                        mAdapter.notifyDataSetChanged();*/
-                   // }
                     DataSearch();
 
                 }
@@ -355,24 +314,17 @@ public class Member_list extends AppCompatActivity {
             // Spinner for Status (Pregnant/Death);
             //=========================================================================================
 
-            Spinner spnStatus = findViewById(R.id.spnStatus);
-            // Define spinner options from strings.xml
-            ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(
-                    this,
-                    R.array.spinner_status_options,
-                    android.R.layout.simple_spinner_item
-            );
-            statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            List<String> listStatus = new ArrayList<String>();
+            listStatus.add("");
+            listStatus.add("1-Pregnant");
+            listStatus.add("2-Death");
+            spnStatus.setAdapter(new CustomSpinnerAdapter(this,new ArrayList<>(listStatus)));
 
-            // Set the adapter
-            spnStatus.setAdapter(statusAdapter);
             spnStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                    //  String selectedStatus = spnStatus.getSelectedItem().toString();
                     DataSearch();
-
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
@@ -380,11 +332,6 @@ public class Member_list extends AppCompatActivity {
                 }
             });
 
-
-
-
-
-            // txtSearch = (EditText)findViewById(R.id.txtSearch);
 
             recyclerView = (RecyclerView)findViewById(R.id.recyclerViewMembers);
             mAdapter = new DataAdapter(dataList);
@@ -399,8 +346,6 @@ public class Member_list extends AppCompatActivity {
             recyclerView.setAdapter(mAdapter);
 
 
-
-
         }
         catch(Exception  e)
         {
@@ -408,35 +353,6 @@ public class Member_list extends AppCompatActivity {
             return;
         }
     }
-
-   /* private void filterByStatus(String status) {
-        String query = "SELECT MemID, DSSID, VillID, Pstat, DthDate, Name, HHHead, Age, Sex, LmpDt, BDate, MoName, FaName, Active " +
-                "FROM Member_Allinfo WHERE Active = '1'";
-
-        if ("Pregnant".equals(status)) {
-            query += " AND Pstat = '41'";
-        } else if ("Death".equals(status)) {
-            query += " AND DthDate BETWEEN '2000-01-01' AND '2024-12-31'";
-        }
-
-
-
-        try {
-            Connection connection = new Connection(this);
-            List<Member_DataModel> filteredMembers = connection.fetchMembers(query);
-
-            if (filteredMembers.isEmpty()) {
-                Toast.makeText(this, "No results found for the selected status.", Toast.LENGTH_SHORT).show();
-            } else {
-                dataList.clear();
-                dataList.addAll(filteredMembers);  // Update the global list
-                mAdapter.notifyDataSetChanged();   // Notify the adapter
-            }
-        } catch (Exception e) {
-            Toast.makeText(this, "Error fetching data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }*/
-
 
 
 
@@ -446,6 +362,7 @@ public class Member_list extends AppCompatActivity {
         String selectedVillage = spnVillage.getSelectedItem() != null ? spnVillage.getSelectedItem().toString() : "";
         String selectedCompound = spnCompound.getSelectedItem() != null ? spnCompound.getSelectedItem().toString() : "";
         String selectedHousehold = spnHousehold.getSelectedItem() != null ? spnHousehold.getSelectedItem().toString() : "";
+        //   String selectStatus = spnStatus.getSelectedItem() != null ? spnStatus.getSelectedItem().toString() : "";
 
         // Check if the default "Select from list" is selected
         if (selectedLocation.equals("Select from list")|| selectedLocation.isEmpty()) {
@@ -459,9 +376,10 @@ public class Member_list extends AppCompatActivity {
         String selectedLocId = selectedLocation.split("-")[0].trim();
 
         String selectedVillageId = selectedVillage.contains("-") ? selectedVillage.split("-")[0].trim() : "";
-
         String selectedCompoundId = selectedCompound.contains("-") ? selectedCompound.split("-")[0].trim() : "";
         String selectedHouseholdId = selectedHousehold.contains("-") ? selectedHousehold.split("-")[0].trim() : "";
+        //  String selectedStatusId = spnStatus.getSelectedItemPosition() == 0 ? "" : spnStatus.getSelectedItem().toString().split("-")[0];
+        //  String selectedStatus = spnStatus.getSelectedItem().toString();
 
 
 
@@ -469,13 +387,9 @@ public class Member_list extends AppCompatActivity {
         // Construct SQL query
         String SQL = "SELECT MemID, DSSID, VillID, Pstat,DthDate, Name, HHHead, Age, Sex, LmpDt, BDate, MoName, FaName, Active " +
                 "FROM Member_Allinfo " +
-              //  "WHERE GeoLevel7 = '" + selectedLocId + "' " +
+                //  "WHERE GeoLevel7 = '" + selectedLocId + "' " +
                 "WHERE VillID = '" + selectedVillageId + "' " +
                 "AND Active = '1'";
-
-       /* if (!selectedVillageId.isEmpty()) {
-            SQL += " AND VillID = '" + selectedVillageId + "'";
-        }*/
 
         if (!selectedCompoundId.isEmpty()) {
             SQL += " AND CompoundID = '" + selectedCompoundId + "'";
@@ -493,56 +407,14 @@ public class Member_list extends AppCompatActivity {
 
         Log.d("DataSearch", "SQL Query: " + SQL);
 
-
-            /*if (spnStatus.getSelectedItemPosition() != 0) {
-
-
-                if (spnStatus.getSelectedItemPosition() == 1) {
-                    SQL += " AND Pstat = '41'";
-                } else if (spnStatus.getSelectedItemPosition() == 2) {
-                    SQL += " AND DthDate BETWEEN '2000-01-01' AND '2024-12-31'";
-                }
-            }
-*/
-
         if (spnStatus.getSelectedItemPosition() != 0) {
-            int selectedPosition = spnStatus.getSelectedItemPosition();
-            Log.d("DataSearch", "spnStatus selected position: " + selectedPosition);
-
-            if (selectedPosition == 1) {
+            if (spnStatus.getSelectedItemPosition() == 1) {
                 SQL += " AND Pstat = '41'";
-            } else if (selectedPosition == 2) {
+            } else if (spnStatus.getSelectedItemPosition() == 2) {
                 SQL += " AND DthDate BETWEEN '2000-01-01' AND '2024-12-31'";
-            } else {
-                Log.d("DataSearch", "Unhandled spnStatus position: " + selectedPosition);
-            }
-        }
-        Log.d("DataSearch", "SQL Query after status filter: " + SQL);
-
-
-
-
-
-
-
-        // Filter the existing dataList
-       /* List<Member_DataModel> filteredList = C.fetchMembers(SQL);
-        for (Member_DataModel member : dataList) {
-            if (member.getHHHead() != null && member.getHHHead().toLowerCase().contains(searchText)) {
-                filteredList.add(member);
             }
         }
 
-
-
-        // Update RecyclerView
-        if (filteredList.isEmpty()) {
-            Toast.makeText(this, "No results found for the search term.", Toast.LENGTH_SHORT).show();
-        } else {
-            mAdapter = new DataAdapter(filteredList);
-            recyclerView.setAdapter(mAdapter);
-            mAdapter.notifyDataSetChanged();
-        }*/
 
         List<Member_DataModel> filteredList = C.fetchMembers(SQL);
 
@@ -566,8 +438,6 @@ public class Member_list extends AppCompatActivity {
         super.onResume();
 
     }
-
-
 
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -692,7 +562,6 @@ public class Member_list extends AppCompatActivity {
                 holder.DthStatus.setVisibility(View.GONE);
                 holder.DthDate.setVisibility(View.GONE);
             }
-
 
 
 
