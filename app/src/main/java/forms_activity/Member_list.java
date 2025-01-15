@@ -173,8 +173,8 @@ public class Member_list extends AppCompatActivity {
 
             spnLocation = (Spinner)findViewById(R.id.spnLocation);
             spnVillage = (Spinner)findViewById(R.id.spnVillage);
-            spnCompound = (Spinner)findViewById(R.id.spnCompound);
-            spnHousehold = (Spinner)findViewById(R.id.spnHousehold);
+         //   spnCompound = (Spinner)findViewById(R.id.spnCompound);
+          //  spnHousehold = (Spinner)findViewById(R.id.spnHousehold);
             spnStatus = (Spinner)findViewById(R.id.spnStatus);
 
             List<String> locationList = new ArrayList<>();
@@ -190,11 +190,11 @@ public class Member_list extends AppCompatActivity {
 
             spnVillage.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT VillID || '-' || VillName FROM Member_Allinfo " +
                     "WHERE GeoLevel7 = '" + spnLocation.getSelectedItem().toString().split("-")[0] + "'"));
-            spnCompound.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
-                    "WHERE VillID = '" + spnVillage.getSelectedItem().toString().split("-")[0] + "'"));
-            spnHousehold.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT HHID || '-' || HHHead FROM Member_Allinfo " +
-                    "WHERE CompoundID = '" + spnCompound.getSelectedItem().toString().split("-")[0] + "'"
-            ));
+//            spnCompound.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
+//                    "WHERE VillID = '" + spnVillage.getSelectedItem().toString().split("-")[0] + "'"));
+//            spnHousehold.setAdapter(C.getArrayAdapter("SELECT '' UNION SELECT DISTINCT HHID || '-' || HHHead FROM Member_Allinfo " +
+//                    "WHERE CompoundID = '" + spnCompound.getSelectedItem().toString().split("-")[0] + "'"
+//            ));
 
 
             //=========================================================================================
@@ -210,8 +210,8 @@ public class Member_list extends AppCompatActivity {
                         // Default item selected; take appropriate action (e.g., show a message or clear dependent spinners)
 
                         spnVillage.setAdapter(null);
-                        spnCompound.setAdapter(null);
-                        spnHousehold.setAdapter(null);
+                     //   spnCompound.setAdapter(null);
+                       // spnHousehold.setAdapter(null);
                         // Clear RecyclerView data if it changes from LocationItem to default
                         txtSearch.setText("");
                         dataList.clear();
@@ -249,10 +249,10 @@ public class Member_list extends AppCompatActivity {
 
                     String selectedVillage = spnVillage.getSelectedItem().toString().split("-")[0];
 
-                    spnCompound.setAdapter(C.getArrayAdapter(
-                            "SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
-                                    "WHERE VillID = '" + selectedVillage + "'"
-                    ));
+//                    spnCompound.setAdapter(C.getArrayAdapter(
+//                            "SELECT '' UNION SELECT DISTINCT CompoundID || '-' || CompoundName FROM Member_Allinfo " +
+//                                    "WHERE VillID = '" + selectedVillage + "'"
+//                    ));
 
                     DataSearch();
                 }
@@ -265,7 +265,7 @@ public class Member_list extends AppCompatActivity {
             // Spinner for Compound
             //=========================================================================================
 
-            spnCompound.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+           /* spnCompound.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
@@ -285,7 +285,7 @@ public class Member_list extends AppCompatActivity {
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {}
-            });
+            });*/
 
 
             //=========================================================================================
@@ -293,7 +293,7 @@ public class Member_list extends AppCompatActivity {
             //=========================================================================================
 
 
-            spnHousehold.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+           /* spnHousehold.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     //   if (spnHousehold.getSelectedItem() != null && position != 0) {
@@ -308,7 +308,7 @@ public class Member_list extends AppCompatActivity {
                 public void onNothingSelected(AdapterView<?> parent) {
 
                 }
-            });
+            });*/
 
             //=========================================================================================
             // Spinner for Status (Pregnant/Death);
@@ -360,8 +360,8 @@ public class Member_list extends AppCompatActivity {
         String searchText = txtSearch.getText().toString().trim();
         String selectedLocation = spnLocation.getSelectedItem().toString();
         String selectedVillage = spnVillage.getSelectedItem() != null ? spnVillage.getSelectedItem().toString() : "";
-        String selectedCompound = spnCompound.getSelectedItem() != null ? spnCompound.getSelectedItem().toString() : "";
-        String selectedHousehold = spnHousehold.getSelectedItem() != null ? spnHousehold.getSelectedItem().toString() : "";
+      //  String selectedCompound = spnCompound.getSelectedItem() != null ? spnCompound.getSelectedItem().toString() : "";
+      //  String selectedHousehold = spnHousehold.getSelectedItem() != null ? spnHousehold.getSelectedItem().toString() : "";
         //   String selectStatus = spnStatus.getSelectedItem() != null ? spnStatus.getSelectedItem().toString() : "";
 
         // Check if the default "Select from list" is selected
@@ -376,8 +376,8 @@ public class Member_list extends AppCompatActivity {
         String selectedLocId = selectedLocation.split("-")[0].trim();
 
         String selectedVillageId = selectedVillage.contains("-") ? selectedVillage.split("-")[0].trim() : "";
-        String selectedCompoundId = selectedCompound.contains("-") ? selectedCompound.split("-")[0].trim() : "";
-        String selectedHouseholdId = selectedHousehold.contains("-") ? selectedHousehold.split("-")[0].trim() : "";
+      //  String selectedCompoundId = selectedCompound.contains("-") ? selectedCompound.split("-")[0].trim() : "";
+      //  String selectedHouseholdId = selectedHousehold.contains("-") ? selectedHousehold.split("-")[0].trim() : "";
         //  String selectedStatusId = spnStatus.getSelectedItemPosition() == 0 ? "" : spnStatus.getSelectedItem().toString().split("-")[0];
         //  String selectedStatus = spnStatus.getSelectedItem().toString();
 
@@ -391,13 +391,13 @@ public class Member_list extends AppCompatActivity {
                 "WHERE VillID = '" + selectedVillageId + "' " +
                 "AND Active = '1'";
 
-        if (!selectedCompoundId.isEmpty()) {
+        /*if (!selectedCompoundId.isEmpty()) {
             SQL += " AND CompoundID = '" + selectedCompoundId + "'";
         }
 
         if (!selectedHouseholdId.isEmpty()) {
             SQL += " AND Household_ID = '" + selectedHouseholdId + "'";
-        }
+        }*/
 
 
 

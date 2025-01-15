@@ -39,18 +39,7 @@
                 android:textSize="20sp" />
 
 
-            <LinearLayout android:layout_alignParentEnd="true" android:background="@color/pageHeadingBack" android:id="@+id/secRound" android:layout_weight="1" android:layout_width="wrap_content" android:layout_height="match_parent" android:orientation="horizontal" style="@style/rowStyle0">
-                <TextView android:id="@+id/lblStatus"
-                    android:textSize="22dp"
-                    android:gravity="center_vertical"
-                    android:background="@color/pageHeadingBack"
-                    android:textColor="@color/pageHeading"
-                    android:textStyle="bold"
-                    android:text="Status"
-                    android:layout_width="90sp"
-                    android:layout_height="match_parent"/>
-                <Spinner android:id="@+id/spnStatus"  android:drawSelectorOnTop="true" android:layout_width="100dp" android:layout_height="wrap_content" android:layout_weight="0" android:layout_marginRight="10sp"/>
-            </LinearLayout>
+
 
 
         </RelativeLayout>
@@ -77,18 +66,27 @@
 
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/secCCode"  android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal" style="@style/rowStyle2">
+        <LinearLayout android:id="@+id/secCCode" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal" style="@style/rowStyle2">
             <TextView android:id="@+id/lblCCode" android:text="3."  android:layout_width="40sp" android:layout_height="wrap_content" android:textSize="18sp" />
             <TextView android:id="@+id/VlblCCode" android:text="Compound" android:layout_width="125sp" android:layout_height="wrap_content" android:textSize="18sp" />
             <Spinner android:id="@+id/spnCompound" android:drawSelectorOnTop="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="0" android:prompt="@string/planet_prompt" android:textSize="18sp" />
 
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/secHCode"  android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal" style="@style/rowStyle2">
+        <LinearLayout android:id="@+id/secHCode" android:visibility="gone"  android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal" style="@style/rowStyle2">
             <TextView android:id="@+id/lblHCode" android:text="4."  android:layout_width="40sp" android:layout_height="wrap_content" android:textSize="18sp" />
             <TextView android:id="@+id/VlblHCode" android:text="Household" android:layout_width="125sp" android:layout_height="wrap_content" android:textSize="18sp" />
             <Spinner android:id="@+id/spnHousehold" android:drawSelectorOnTop="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="0" android:prompt="@string/planet_prompt" android:textSize="18sp" />
         </LinearLayout>
+
+        <LinearLayout android:id="@+id/secRound"  android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="horizontal" style="@style/rowStyle2">
+            <TextView android:id="@+id/lblStatus" android:text="3."  android:layout_width="40sp" android:layout_height="wrap_content" android:textSize="18sp" />
+            <TextView android:id="@+id/vlblStatus" android:text="Status" android:layout_width="125sp" android:layout_height="wrap_content" android:textSize="18sp" />
+
+            <Spinner android:id="@+id/spnStatus"  android:drawSelectorOnTop="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="0" android:layout_marginRight="10sp"/>
+        </LinearLayout>
+
+
 
 
 
