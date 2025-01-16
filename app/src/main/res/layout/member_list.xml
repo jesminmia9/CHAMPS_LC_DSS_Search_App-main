@@ -17,9 +17,6 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-
-
-
             <ImageButton android:id="@+id/cmdBack"
                 android:background="@color/pageHeadingBack"
                 android:src="@drawable/back"
@@ -29,16 +26,16 @@
 
             <TextView
                 android:id="@+id/lblHeading"
-                android:layout_width="120dp"
+                android:layout_width="145dp"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="-3dp"
                 android:layout_toRightOf="@+id/cmdBack"
                 android:gravity="center_vertical"
                 android:paddingLeft="10sp"
-                android:text="Member Details"
+                android:text="Member List"
                 android:textColor="@color/pageHeading"
                 android:textSize="20sp" />
-
-
+            <TextView android:id="@+id/lblTotal" android:layout_alignParentEnd="true" android:text=" (Total:0)"  android:paddingLeft="10sp" android:layout_width="wrap_content" android:layout_height="match_parent" android:gravity="center_vertical" android:textSize="20sp" android:textColor="@color/pageHeading"/>
 
 
 
@@ -83,7 +80,13 @@
             <TextView android:id="@+id/lblStatus" android:text="3."  android:layout_width="40sp" android:layout_height="wrap_content" android:textSize="18sp" />
             <TextView android:id="@+id/vlblStatus" android:text="Status" android:layout_width="125sp" android:layout_height="wrap_content" android:textSize="18sp" />
 
-            <Spinner android:id="@+id/spnStatus"  android:drawSelectorOnTop="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="0" android:layout_marginRight="10sp"/>
+            <Spinner
+                android:id="@+id/spnStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10sp"
+                android:layout_weight="0"
+                android:drawSelectorOnTop="true" />
         </LinearLayout>
 
 
@@ -110,7 +113,7 @@
             android:layout_alignParentStart="true"
             android:layout_centerInParent="true"
             android:layout_marginRight="60dp"
-            android:hint="Household Head"
+            android:hint="DSSID /Name /Mobile /Compound ID"
             android:inputType="text"
             android:maxLength="100"
             android:padding="10dp"

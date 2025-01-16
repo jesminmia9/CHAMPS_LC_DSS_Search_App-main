@@ -113,6 +113,7 @@ public class Member_list extends AppCompatActivity {
     static String TableName;
 
     Bundle IDbundle;
+    TextView lblTotal;
     Spinner spnLocation;
     Spinner spnVillage;
     Spinner spnCompound;
@@ -159,7 +160,7 @@ public class Member_list extends AppCompatActivity {
                         }});
                     adb.show();
                 }});
-
+            lblTotal = (TextView)findViewById(R.id.lblTotal);
             txtSearch = (EditText)findViewById(R.id.txtSearch);
             btnSearch = (ImageButton) findViewById(R.id.btnSearch);
 
@@ -315,7 +316,7 @@ public class Member_list extends AppCompatActivity {
             //=========================================================================================
 
             List<String> listStatus = new ArrayList<String>();
-            listStatus.add("");
+            listStatus.add("0-All");
             listStatus.add("1-Pregnant");
             listStatus.add("2-Death");
             spnStatus.setAdapter(new CustomSpinnerAdapter(this,new ArrayList<>(listStatus)));
@@ -357,6 +358,8 @@ public class Member_list extends AppCompatActivity {
 
 
     private void DataSearch() {
+        Member_DataModel d = new Member_DataModel();
+
         String searchText = txtSearch.getText().toString().trim();
         String selectedLocation = spnLocation.getSelectedItem().toString();
         String selectedVillage = spnVillage.getSelectedItem() != null ? spnVillage.getSelectedItem().toString() : "";
@@ -397,13 +400,26 @@ public class Member_list extends AppCompatActivity {
 
         if (!selectedHouseholdId.isEmpty()) {
             SQL += " AND Household_ID = '" + selectedHouseholdId + "'";
+        }
+
+        */
+
+
+
+       /* if (!TextUtils.isEmpty(searchText)) {
+            SQL += " AND HHHead LIKE '%" + searchText + "%'";
         }*/
 
-
-
+        // Add search conditions for MemID, DSSID, or HHHead
         if (!TextUtils.isEmpty(searchText)) {
-            SQL += " AND HHHead LIKE '%" + searchText + "%'";
+            SQL += " AND (MemID LIKE '%" + searchText + "%' " +
+                    "OR DSSID LIKE '%" + searchText + "%' " +
+                    "OR Name LIKE '%" + searchText + "%' " +
+                    "OR HHHead LIKE '%" + searchText + "%')";
         }
+
+
+
 
         Log.d("DataSearch", "SQL Query: " + SQL);
 
@@ -428,8 +444,11 @@ public class Member_list extends AppCompatActivity {
 
         dataList.clear();
         dataList.addAll(filteredList);
+        lblTotal.setText(" (Total: "+ dataList.size() +")");
         mAdapter.notifyDataSetChanged();
         Log.d("DataSearch", "Data updated in RecyclerView."+ dataList.size() + " items.");
+
+
     }
 
 

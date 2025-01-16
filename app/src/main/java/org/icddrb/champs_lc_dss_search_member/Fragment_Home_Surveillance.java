@@ -67,6 +67,7 @@ public class Fragment_Home_Surveillance extends Fragment {
                     if(position==0)
                     {
                         Intent I = new Intent(thiscontext, Member_list.class);
+                        //Baseline_Compound_list
                         IBundle.putString("locationid", "");
                         IBundle.putString("locationname", "Village/Area Name");
                         IBundle.putString("SurvType", "2");
