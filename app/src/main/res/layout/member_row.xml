@@ -44,6 +44,20 @@
             android:padding="7dp"
             android:text="Pregnant" />
 
+        <!--ImageView for Pregnant
+        <ImageView
+            android:id="@+id/pregnant"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight=".3"
+            android:gravity="center"
+            android:padding="7dp"
+            android:background="@null"
+            android:src="@drawable/preg" />-->
+
+
+
+
         <!-- Death Button -->
         <TextView
             android:id="@+id/DthStatus"

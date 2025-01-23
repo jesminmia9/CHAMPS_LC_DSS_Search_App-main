@@ -27,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -412,10 +413,10 @@ public class Member_list extends AppCompatActivity {
 
         // Add search conditions for MemID, DSSID, or HHHead
         if (!TextUtils.isEmpty(searchText)) {
-            SQL += " AND (MemID LIKE '%" + searchText + "%' " +
-                    "OR DSSID LIKE '%" + searchText + "%' " +
+            SQL += " AND (DSSID LIKE '%" + searchText + "%' " +
                     "OR Name LIKE '%" + searchText + "%' " +
-                    "OR HHHead LIKE '%" + searchText + "%')";
+                    "OR MobileNo LIKE '%" + searchText + "%' " +
+                    "OR CompoundID LIKE '%" + searchText + "%')";
         }
 
 
@@ -439,8 +440,10 @@ public class Member_list extends AppCompatActivity {
             Toast.makeText(this, "No results found for the search term.", Toast.LENGTH_SHORT).show();
             dataList.clear();
             mAdapter.notifyDataSetChanged();
+            lblTotal.setText(" (Total: 0)"); // Explicitly update lblTotal to show 0
             return;
         }
+
 
         dataList.clear();
         dataList.addAll(filteredList);
@@ -474,7 +477,8 @@ public class Member_list extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             LinearLayout secMemberDetail;
-            TextView MemID, DSSID,preganat, Name, HHHead, Age,Sex, LmpDt, BDate, MoName, FaName, DthDate,  DthStatus;
+            TextView MemID, DSSID, Name, HHHead, Age,Sex, pregnant, LmpDt, BDate, MoName, FaName, DthDate,  DthStatus;
+         //   ImageView pregnant;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -482,7 +486,8 @@ public class Member_list extends AppCompatActivity {
                 secMemberDetail = (LinearLayout) findViewById(R.id.secMemberDetail);
                 MemID=(TextView)itemView.findViewById(R.id.MemberID);
                 DSSID=(TextView)itemView.findViewById(R.id.DSSID);
-                preganat=(TextView)itemView.findViewById(R.id.preganat);
+                pregnant=(TextView)itemView.findViewById(R.id.preganat);
+              //  pregnant = itemView.findViewById(R.id.pregnant); // Add this line
                 DthDate=(TextView)itemView.findViewById(R.id.DthDate);
                 DthStatus=(TextView)itemView.findViewById(R.id.DthStatus);
                 Name =(TextView)itemView.findViewById(R.id.Name);
@@ -516,7 +521,7 @@ public class Member_list extends AppCompatActivity {
             Member_DataModel member = dataList.get(position);
             holder.DSSID.setText("DSSID: " + member.getDSSID());
             holder.Name.setText(member.getName());
-            holder.preganat.setText(member.getPstat() != null && !member.getPstat().equals("NULL") ? member.getPstat() : "");
+            holder.pregnant.setText(member.getPstat() != null && !member.getPstat().equals("NULL") ? member.getPstat() : "");
             holder.DthDate.setText(member.getDthDate() != null && !member.getDthDate().equals("NULL") ? member.getDthDate() : "");
             holder.HHHead.setText(member.getHHHead() != null && !member.getHHHead().equals("NULL") ? member.getHHHead() : "");
             holder.MoName.setText(member.getMoName() != null && !member.getMoName().equals("NULL") ? member.getMoName() : "");
@@ -525,8 +530,8 @@ public class Member_list extends AppCompatActivity {
             // Handle Preganat and LmpDt display logic
             String preganatValue = member.getPstat(); // Assuming Pstat holds the pregnant status
             if ("41".equals(preganatValue)) {
-                holder.preganat.setText("Pregnant"); // Display 'Pregnant' instead of 41
-                holder.preganat.setVisibility(View.VISIBLE);
+                holder.pregnant.setText("Pregnant"); // Display 'Pregnant' instead of 41
+                holder.pregnant.setVisibility(View.VISIBLE);
 
                 // Display LmpDt with proper formatting if needed
                 String lmprawDate = member.getLmpDt();
@@ -552,7 +557,7 @@ public class Member_list extends AppCompatActivity {
                 holder.LmpDt.setVisibility(View.VISIBLE);
             } else {
                 // Hide both preganat and LmpDt if the condition is not met
-                holder.preganat.setVisibility(View.GONE);
+                holder.pregnant.setVisibility(View.GONE);
                 holder.LmpDt.setVisibility(View.GONE);
             }
 
