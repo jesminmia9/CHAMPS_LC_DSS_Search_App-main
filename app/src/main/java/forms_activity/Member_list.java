@@ -389,7 +389,7 @@ public class Member_list extends AppCompatActivity {
 
 
         // Construct SQL query
-        String SQL = "SELECT MemID, DSSID, VillID, Pstat,DthDate, Name, HHHead, Age, Sex, LmpDt, BDate, MoName, FaName, Active " +
+        String SQL = "SELECT MemID, DSSID, VillID, Pstat,DthDate, Name, HHHead, Age, Sex, LmpDt, BDate, MoName, FaName,Rth, MS, EduY, Ocp, Religion, MobileNo, Sp1Name, Active " +
                 "FROM Member_Allinfo " +
                 //  "WHERE GeoLevel7 = '" + selectedLocId + "' " +
                 "WHERE VillID = '" + selectedVillageId + "' " +
@@ -477,7 +477,7 @@ public class Member_list extends AppCompatActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             LinearLayout secMemberDetail;
-            TextView MemID, DSSID, Name, HHHead, Age,Sex,  LmpDt, BDate, MoName, FaName, DthDate,  DthStatus;
+            TextView MemID, DSSID, Name, HHHead, Age,Sex,  LmpDt, BDate, MoName, FaName, DthDate,  DthStatus, Rth, MS, EduY, Ocp, Religion, MobileNo, Sp1Name;
             //TextView pregnant
             ImageView pregnant;
 
@@ -487,7 +487,6 @@ public class Member_list extends AppCompatActivity {
                 secMemberDetail = (LinearLayout) findViewById(R.id.secMemberDetail);
                 MemID=(TextView)itemView.findViewById(R.id.MemberID);
                 DSSID=(TextView)itemView.findViewById(R.id.DSSID);
-              //  pregnant=(TextView)itemView.findViewById(R.id.pregnant);
                 pregnant = itemView.findViewById(R.id.pregnant); // Add this line
                 DthDate=(TextView)itemView.findViewById(R.id.DthDate);
                 DthStatus=(TextView)itemView.findViewById(R.id.DthStatus);
@@ -498,6 +497,13 @@ public class Member_list extends AppCompatActivity {
                 BDate = (TextView)itemView.findViewById(R.id.BDate);
                 MoName = (TextView)itemView.findViewById(R.id.MoName);
                 FaName = (TextView)itemView.findViewById(R.id.FaName);
+                Rth =(TextView)itemView.findViewById(R.id.Rth);
+                MS =(TextView)itemView.findViewById(R.id.MS);
+                EduY = (TextView)itemView.findViewById(R.id.EduY);
+                Ocp =(TextView)itemView.findViewById(R.id.Ocp);
+                Religion = (TextView)itemView.findViewById(R.id.Religion);
+                MobileNo = (TextView)itemView.findViewById(R.id.MobileNo);
+                Sp1Name = (TextView)itemView.findViewById(R.id.Sp1Name);
             }
         }
 
@@ -528,6 +534,22 @@ public class Member_list extends AppCompatActivity {
             holder.HHHead.setText(member.getHHHead() != null && !member.getHHHead().equals("NULL") ? member.getHHHead() : "");
             holder.MoName.setText(member.getMoName() != null && !member.getMoName().equals("NULL") ? member.getMoName() : "");
             holder.FaName.setText(member.getFaName() != null && !member.getFaName().equals("NULL") ? member.getFaName() : "");
+            holder.Rth.setText(member.getRth() != null && !member.getRth().equals("NULL") ? member.getRth() : "");
+            holder.MS.setText(member.getMS() != null && !member.getMS().equals("NULL") ? member.getMS() : "");
+            holder.EduY.setText(member.getEduY() != null && !member.getEduY().equals("NULL") ? member.getEduY() : "");
+            holder.Ocp.setText(member.getOcp() != null && !member.getOcp().equals("NULL") ? member.getOcp() : "");
+            holder.Religion.setText(member.getReligion() != null && !member.getReligion().equals("NULL") ? member.getReligion() : "");
+            holder.MobileNo.setText(member.getMobileNo() != null && !member.getMobileNo().equals("NULL") ? member.getMobileNo() : "");
+            holder.Sp1Name.setText(member.getSp1Name() != null && !member.getSp1Name().equals("NULL") ? member.getSp1Name() : "");
+
+
+
+
+
+
+
+
+
 
             // Handle pregnant and LmpDt display logic
             String pregnantValue = member.getPstat(); // Assuming Pstat holds the pregnant status

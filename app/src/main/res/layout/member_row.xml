@@ -238,6 +238,127 @@
 
 
 
+            <TextView
+                android:id="@+id/EduY"
+                android:textStyle="normal"
+                android:maxLength="10"
+                android:layout_column="3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1.1" />
+
+
+            <TextView
+                android:id="@+id/labelMS"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_columnWeight="0.8"
+                android:text="  MS      :"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/MS"
+                android:textStyle="normal"
+                android:layout_column="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1.2" />
+            <TextView
+                android:text="EduY   :"
+                android:textStyle="bold"
+                android:layout_column="2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="0.9" />
+
+            <TextView
+                android:id="@+id/Religion"
+                android:textStyle="normal"
+                android:maxLength="10"
+                android:layout_column="3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1.1" />
+
+
+            <TextView
+                android:id="@+id/labelOcp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_columnWeight="0.8"
+                android:text="  Ocp     :"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/Ocp"
+                android:textStyle="normal"
+                android:layout_column="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1.2" />
+            <TextView
+                android:text="Religion   :"
+                android:textStyle="bold"
+                android:layout_column="2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="0.9" />
+
+            <TextView
+                android:id="@+id/Sp1Name"
+                android:textStyle="normal"
+                android:maxLength="10"
+                android:layout_column="3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1.1" />
+
+
+            <TextView
+                android:id="@+id/labelMobile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_columnWeight="0.8"
+                android:text="  MNo    :"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/MobileNo"
+                android:textStyle="normal"
+                android:layout_column="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1.2" />
+            <TextView
+                android:text="Spouse   :"
+                android:textStyle="bold"
+                android:layout_column="2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="0.9" />
+
+            <TextView
+                android:text="  Rth      :"
+                android:textStyle="bold"
+                android:layout_column="0"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="0.8" />
+            <TextView
+                android:id="@+id/Rth"
+                android:textStyle="normal"
+                android:layout_column="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1.2" />
+
+
+
+
+
         </GridLayout>
     </LinearLayout>
 </RelativeLayout>

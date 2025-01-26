@@ -192,6 +192,12 @@ public class Member_DataModel {
         public void setFaName(String newValue){
               _FaName = newValue;
          }
+
+
+
+
+
+
         private String _EduY = "";
         public String getEduY(){
               return _EduY;
