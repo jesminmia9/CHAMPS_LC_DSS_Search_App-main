@@ -211,15 +211,13 @@ public class Fragment_Home_Surveillance extends Fragment {
 
         private final String[] menu_list={
                 "SEARCH MEMBER",
-                "DASHBOARD",
-                "DATA SYNC",
+                 "DATA SYNC",
                 "EXIT"
         };
 
         //references to our images
         private final Integer[] menu_list_image = {
                 R.drawable.img_surveillance,
-                R.drawable.img_dashboard,
                 R.drawable.img_datasync1,
                 R.drawable.img_exit,
         };
